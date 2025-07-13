@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Selector de Estratagemas - Helldivers 2</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    body { background-color: #111827; color: white; }
+    .selected { outline: 4px solid #22c55e; border-radius: 0.5rem; }
+  </style>
+</head>
+<body class="p-4">
+  <h1 class="text-3xl font-bold mb-6 text-center">ESTRATAGEMAS</h1>
+
+  <h2 class="text-xl font-semibold mb-2">De misión (fijas)</h2>
+  <div id="estratagemasMision" class="flex overflow-x-auto gap-4 p-2 h-32 bg-yellow-900/30 rounded mb-6"></div>
+
+  <h2 class="text-xl font-semibold mb-2">Seleccionables</h2>
+  <div id="estratagemas" class="flex overflow-x-auto gap-4 p-2 h-32 bg-gray-800 rounded mb-6"></div>
+
+  <h2 class="text-2xl font-semibold mb-2">Seleccionadas</h2>
+  <div id="seleccionadas" class="grid grid-cols-1 md:grid-cols-2 gap-4 p-4 bg-gray-800 rounded min-h-[100px]"></div>
+
+
+  <div class="text-center mt-6">
+    <button id="limpiarBtn" class="bg-red-600 hover:bg-red-700 px-5 py-2 rounded text-white font-semibold">Borrar</button>
+  </div>
+
+  <script>
+   const estratagemas = [
+    //generalmente en misiones//
+  { nombre: "Reforzar", imagen: "svg/Reinforce.svg", codigo: "↑↓→←↑", mision: true },
+  { nombre: "Baliza SOS", imagen: "svg/SOS_Beacon.svg", codigo: "↑↓→↑", mision: true },
+  { nombre: "Reabastecer", imagen: "svg/Resupply.svg", codigo: "↓↓↑→", mision: true },
+  { nombre: "Rearme de Águila", imagen: "svg/Eagle_Rearm.svg", codigo: "↑↑←↑→" },
+        //falta Entrega de SSSD - //
+  { nombre: "Subir Datos - Entrega de SSSD", imagen: "svg/Upload_Data.svg", codigo: "←→↑↑↑"},
+  { nombre: "Bomba Hell", imagen: "svg/Hellbomb.svg", codigo: "↓↑←↓↑→↓↑"},
+  { nombre: "Sonda Sísmica", imagen: "svg/Seismic_Probe.svg", codigo: "↑↑←→↓↓" },
+  { nombre: "Artillería SEAF", imagen: "svg/SEAF_Artillery.svg", codigo: "→↑↑↓" },
+  { nombre: "Bandera Super Tierra", imagen: "svg/Super_Earth_Flag.svg", codigo: "↓↑↓↑"},
+  { nombre: "Taladro Rompecolmenas", imagen: "svg/Hive_Breaker_Drill.svg", codigo: "←↑↓→↓↓"},
+  { nombre: "Taladro Tectónico", imagen: "svg/Tectonic_Drill.svg", codigo: "↑↓↑↓↑↓"},  
+  { nombre: "Taladro de Prospección", imagen: "svg/Prospecting_Drill.svg", codigo: "↓↓←→↓↓" },
+  { nombre: "Recipiente de fluido oscuro", imagen: "svg/Dark_Fluid_Vessel.svg", codigo: "↑←→↓↑↑" },
+  { nombre: "Destello de iluminacion orbital", imagen: "svg/Orbital_Illumination_Flare.svg", codigo: "→→←←" },
+  
+  //arma de apoyo//
+  
+  { nombre: "Incondicional", imagen: "svg/Machine_Gun.svg", codigo: "↓←↓↑→" },
+  { nombre: "Rifle Antimaterial", imagen: "svg/Anti-Materiel_Rifle.svg", codigo: "↓←→↑↓" },
+  { nombre: "M-105 Stalwart", imagen: "svg/Stalwart.svg", codigo: "↓←↓↑↑←" },
+  { nombre: "Antitanque Desechable", imagen: "svg/Expendable_Anti-Tank.svg", codigo: "↓↓←↑→" },
+  { nombre: "Rifle sin Retroceso", imagen: "svg/Recoilless_Rifle.svg", codigo: "↓←→→←" },
+  { nombre: "Lanzallamas", imagen: "svg/Flamethrower.svg", codigo: "↓←↑↓↑" },
+  { nombre: "Cañón Automático", imagen: "svg/Autocannon.svg", codigo: "↓←↓↑↑→" },
+  { nombre: "Ametralladora Pesada", imagen: "svg/Heavy_Machine_Gun.svg", codigo: "↓←↑↓↓" },
+  { nombre: "Lanzacohetes de Estallido Aéreo", imagen: "svg/Airburst_Rocket_Launcher.svg", codigo: "↓↑↑←→" },
+  { nombre: "Comando MLS-4x", imagen: "svg/Commando.svg", codigo: "↓←↑↓→" },
+  { nombre: "Cañón de Riel", imagen: "svg/Railgun.svg", codigo: "↓→↓↑←→" },
+  { nombre: "Lanza", imagen: "svg/Spear.svg", codigo: "↓↓↑↓↓" },
+  { nombre: "Lanzador StA-X3 W.A.S.P.", imagen: "svg/StA-X3_W.A.S.P._Launcher.svg", codigo: "↓↓↑↓→" },
+  { nombre: "Lanzador de Arco", imagen: "svg/Arc_Thrower.svg", codigo: "↓→↓↑←←" },  
+  { nombre: "Escudo Direccional", imagen: "svg/Directional_Shield.svg", codigo: "↓↑←→↑↑" },
+  { nombre: "Esterilizador", imagen: "svg/Sterilizer.svg", codigo: "↓←↑↓←" },
+  { nombre: "Cañón Quasar", imagen: "svg/Quasar_Cannon.svg", codigo: "↓↓↑←→" },
+  { nombre: "Cañón Láser LAS-98", imagen: "svg/Laser_Cannon.svg", codigo: "↓←↓↑←" },
+  { nombre: "La Única Bandera Verdadera", imagen: "svg/One_True_Flag.svg", codigo: "↓←→→↑" },
+  { nombre: "Desescalador GL-52", imagen: "svg/GL-52_De-Escalator.svg", codigo: "←→↑←→" },
+  { nombre: "Lanzagranadas", imagen: "svg/Grenade_Launcher.svg", codigo: "↓←↑←↓" },
+
+  //Mochilas
+  { nombre: "Perro Guardián", imagen: "svg/Guard_Dog.svg", codigo: "↓↑←↑→↓" },
+  { nombre: "Aliento del Perro Guardián", imagen: "svg/Guard_Dog_Breath.svg", codigo: "↓↑←↑→↑" },
+  { nombre: "Perro Guardián K-9", imagen: "svg/Guard_Dog_K-9.svg", codigo: "↓↑←↓→←" },
+  { nombre: "Rover Perro Guardián", imagen: "svg/Guard_Dog_Rover.svg", codigo: "↓↑←↓→→" },
+  { nombre: "Mochila de Suministros", imagen: "svg/Supply_Pack.svg", codigo: "↓←↓↑↑↓" },
+  { nombre: "Mochila de Salto", imagen: "svg/Jump_Pack.svg", codigo: "↓↑↑↓↑" },
+  { nombre: "Mochila de Vuelo", imagen: "svg/Hover_Pack.svg", codigo: "↓↑↑↓←→" },
+  { nombre: "Mochila Generadora de Escudo", imagen: "svg/Shield_Generator_Pack.svg", codigo: "↓↑←→←→" },
+  { nombre: "Mochila Generadora de Escudo Direccional", imagen: "svg/Shield_Generator_Pack2.png", codigo: "↓↑←→↑↑" },
+  { nombre: "Mochila Escudo Balístico", imagen: "svg/Ballistic_Shield_Backpack.svg", codigo: "↓←↓↓↑←" },
+  { nombre: "Bomba Infernal Portátil", imagen: "svg/Hellbomb_Portable.svg", codigo: "↑→↑↑↑" },
+  
+
+   //Exos y autos//
+  { nombre: "Vehículo de Reconocimiento Rápido", imagen: "svg/Fast_Recon_Vehicle.svg", codigo: "←↓→↓→↓↑" },
+  { nombre: "Exotraje Patriot", imagen: "svg/Patriot_Exosuit.svg", codigo: "←↓→↑←↓↓" },
+  { nombre: "Exotraje Emancipador", imagen: "svg/Emancipator_Exosuit.svg", codigo: "←↓→↑←↓↓" },
+  
+
+  //Ataque de Aguila
+  { nombre: "Pods de Cohetes águila 110MM", imagen: "svg/Eagle_110MM_Rocket_Pods.svg", codigo: "↑→↑←" },
+  { nombre: "Bomba águila 500KG", imagen: "svg/Eagle_500KG_Bomb.svg", codigo: "↑→↓↓↓" },
+  { nombre: "Ataque Aéreo águila", imagen: "svg/Eagle_Airstrike.svg", codigo: "↑→↓→" },
+  { nombre: "Bomba en Racimo águila", imagen: "svg/Eagle_Cluster_Bomb.svg", codigo: "↑→↓↓→" },
+  { nombre: "Ataque Napalm Aéreo águila", imagen: "svg/Eagle_Napalm_Airstrike.svg", codigo: "↑→↓↑" }, 
+  { nombre: "Ataque de Humo águila", imagen: "svg/Eagle_Smoke_Strike.svg", codigo: "↑→↑↓" },
+  { nombre: "Ataque de Strafing águila", imagen: "svg/Eagle_Strafing_Run.svg", codigo: "↑→→" },  
+
+  { nombre: "Bombardeo Orbital 120MM HE", imagen: "svg/Orbital_120MM_HE_Barrage.svg", codigo: "→→↓←→↓" },
+  { nombre: "Bombardeo Orbital 380MM HE", imagen: "svg/Orbital_380MM_HE_Barrage.svg", codigo: "→↓↑↑←↓↓" },
+  { nombre: "Ataque Orbital de Estallido", imagen: "svg/Orbital_Airburst_Strike.svg", codigo: "→→→" },
+  { nombre: "Ataque EMS Orbital", imagen: "svg/Orbital_EMS_Strike.svg", codigo: "→→←↓" },
+  { nombre: "Ataque Orbital de Gas", imagen: "svg/Orbital_Gas_Strike.svg", codigo: "→→↓→" },
+  { nombre: "Bombardeo Orbital Gatling", imagen: "svg/Orbital_Gatling_Barrage.svg", codigo: "→↓←↑↑" },
+  { nombre: "Láser Orbital", imagen: "svg/Orbital_Laser.svg", codigo: "→↓↑→↓" },
+  { nombre: "Bombardeo Napalm Orbital", imagen: "svg/Orbital_Napalm_Barrage.svg", codigo: "→→↓←→↓" },
+  { nombre: "Ataque de Precisión Orbital", imagen: "svg/Orbital_Precision_Strike.svg", codigo: "→→↑" },
+  { nombre: "Ataque Orbital de Cañón de Riel", imagen: "svg/Orbital_Railcannon_Strike.svg", codigo: "→↑↓↓→" },
+  { nombre: "Ataque Orbital de Humo", imagen: "svg/Orbital_Smoke_Strike.svg", codigo: "→→↓↑" },
+  { nombre: "Bombardeo Orbital Andante", imagen: "svg/Orbital_Walking_Barrage.svg", codigo: "→↓→↓→↓" },
+  
+ 
+  //Centinelas
+  { nombre: "Campo de Minas Antipersonal", imagen: "svg/Anti-Personnel_Minefield.svg", codigo: "↓←↑→" },
+  { nombre: "Emplazamiento antitanque E/AT-12", imagen: "svg/Anti-Tank_Emplacement.svg", codigo: "↓↑←→→→" },
+  { nombre: "Minas Antitanque", imagen: "svg/Anti-Tank_Mines.svg", codigo: "↓←↑↑" },
+  { nombre: "Centinela de Cañón Automático", imagen: "svg/Autocannon_Sentry.svg", codigo: "↓↑→↑←↑" },
+  { nombre: "Torre Tesla", imagen: "svg/Tesla_Tower.svg", codigo: "↓↑→↑←→" },
+  { nombre: "Centinela Mortero EMS", imagen: "svg/EMS_Mortar_Sentry.svg", codigo: "↓↑→↓→" },
+  { nombre: "Centinela Lanzallamas", imagen: "svg/Flame_Sentry.svg", codigo: "↓↑→↓↑↑" },
+  { nombre: "Mina de Gas", imagen: "svg/Gas_Mine.svg", codigo: "↓←←→" },
+  { nombre: "Centinela Gatling", imagen: "svg/Gatling_Sentry.svg", codigo: "↓↑→←" },
+  { nombre: "Repetidor Generador de Escudo", imagen: "svg/Shield_Generator_Relay.svg", codigo: "↓↓←→←→" },
+  { nombre: "Almena de Granaderos", imagen: "svg/Grenadier_Battlement.svg", codigo: "↓→↓←→" },
+  { nombre: "Centinela de Cohetes", imagen: "svg/Rocket_Sentry.svg", codigo: "↓↑→→←" },
+  { nombre: "Posición de Ametralladora Pesada", imagen: "svg/HMG_Emplacement.svg", codigo: "↓↑←→→←" },
+  { nombre: "Centinela de Ametralladora", imagen: "svg/Machine_Gun_Sentry.svg", codigo: "↓↑→→↑" },
+  { nombre: "Centinela Mortero", imagen: "svg/Mortar_Sentry.svg", codigo: "↓↑→→↓" },
+];
+
+
+
+    const contMision = document.getElementById('estratagemasMision');
+    const cont = document.getElementById('estratagemas');
+    const sel = document.getElementById('seleccionadas');
+    const limpiarBtn = document.getElementById('limpiarBtn');
+
+    estratagemas.forEach(e => {
+      const wrapper = document.createElement('div');
+      wrapper.classList.add('flex-shrink-0', 'flex', 'items-center', 'gap-3', 'bg-gray-900', 'rounded', 'px-3', 'py-1');
+
+      const img = document.createElement('img');
+      img.src = e.imagen;
+      img.alt = e.nombre;
+      img.title = e.nombre;
+      img.classList.add('w-14', 'h-14');
+      img.dataset.codigo = e.codigo;
+      img.dataset.nombre = e.nombre;
+
+      
+
+      wrapper.appendChild(img);
+
+      if (e.mision) {
+        wrapper.style.border = "2px solid #facc15";
+        contMision.appendChild(wrapper);
+
+        // Mostrar también en seleccionadas
+        const selWrapper = document.createElement('div');
+        selWrapper.classList.add('bg-gray-900', 'rounded', 'px-4', 'py-2', 'flex', 'gap-2', 'items-center');
+
+        const inner = document.createElement('div');
+        inner.classList.add('flex', 'items-center', 'gap-4');
+
+        const clone = img.cloneNode(true);
+        clone.classList.add('w-20', 'h-20');
+
+        const codigoSel = document.createElement('div');
+        codigoSel.textContent = e.codigo;
+        codigoSel.classList.add('text-4xl', 'font-bold', 'text-yellow-400', 'tracking-widest', 'font-mono');
+
+        const nombreSel = document.createElement('div');
+        nombreSel.textContent = e.nombre;
+        nombreSel.classList.add('text-sm', 'text-white');
+
+        inner.appendChild(clone);
+        inner.appendChild(codigoSel);
+
+        selWrapper.appendChild(inner);
+        selWrapper.appendChild(nombreSel);
+        sel.appendChild(selWrapper);
+      } else {
+        img.classList.add('cursor-pointer');
+
+        img.addEventListener('click', () => {
+          if (!img.classList.contains('selected')) {
+            img.classList.add('selected');
+
+            const selWrapper = document.createElement('div');
+            selWrapper.classList.add('flex', 'flex-col', 'items-center', 'gap-2', 'bg-gray-900', 'rounded', 'px-4', 'py-2');
+
+            const inner = document.createElement('div');
+            inner.classList.add('flex', 'items-center', 'gap-4');
+
+            const clone = img.cloneNode(true);
+            clone.classList.add('w-20', 'h-20');
+
+            const codigoSel = document.createElement('div');
+            codigoSel.textContent = e.codigo;
+            codigoSel.classList.add('text-4xl', 'font-bold', 'text-yellow-400', 'tracking-widest', 'font-mono');
+
+            const nombreSel = document.createElement('div');
+            nombreSel.textContent = e.nombre;
+            nombreSel.classList.add('text-sm', 'text-white');
+
+            inner.appendChild(clone);
+            inner.appendChild(codigoSel);
+
+            selWrapper.appendChild(inner);
+            selWrapper.appendChild(nombreSel);
+            sel.appendChild(selWrapper);
+          } else {
+            img.classList.remove('selected');
+            [...sel.children].forEach(c => {
+              if (c.querySelector('img')?.alt === e.nombre) c.remove();
+            });
+          }
+        });
+
+        cont.appendChild(wrapper);
+      }
+    });
+
+    limpiarBtn.addEventListener('click', () => {
+      document.querySelectorAll('#estratagemas img.selected').forEach(img => img.classList.remove('selected'));
+      [...sel.children].forEach(c => {
+        const nombre = c.querySelector('img')?.alt;
+        const esMision = estratagemas.find(e => e.nombre === nombre)?.mision;
+        if (!esMision) c.remove();
+      });
+    });
+  </script>
+</body>
+</html>
