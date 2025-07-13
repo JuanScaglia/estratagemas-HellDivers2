@@ -27,8 +27,9 @@
     <button id="limpiarBtn" class="bg-red-600 hover:bg-red-700 px-5 py-2 rounded text-white font-semibold">Borrar</button>
   </div>
 
-  <script>
-   const estratagemas = [
+ <script>
+  const estratagemas = [
+    
     //generalmente en misiones//
   { nombre: "Reforzar", imagen: "svg/Reinforce.svg", codigo: "↑↓→←↑", mision: true },
   { nombre: "Baliza SOS", imagen: "svg/SOS_Beacon.svg", codigo: "↑↓→↑", mision: true },
@@ -129,109 +130,97 @@
   { nombre: "Posición de Ametralladora Pesada", imagen: "svg/HMG_Emplacement.svg", codigo: "↓↑←→→←" },
   { nombre: "Centinela de Ametralladora", imagen: "svg/Machine_Gun_Sentry.svg", codigo: "↓↑→→↑" },
   { nombre: "Centinela Mortero", imagen: "svg/Mortar_Sentry.svg", codigo: "↓↑→→↓" },
-];
+   ];
 
+  const contMision = document.getElementById('estratagemasMision');
+  const cont = document.getElementById('estratagemas');
+  const sel = document.getElementById('seleccionadas');
+  const limpiarBtn = document.getElementById('limpiarBtn');
 
+  estratagemas.forEach(e => {
+    const wrapper = document.createElement('div');
+    wrapper.classList.add('flex-shrink-0', 'flex', 'items-center', 'gap-3', 'bg-gray-900', 'rounded', 'px-3', 'py-1');
 
-    const contMision = document.getElementById('estratagemasMision');
-    const cont = document.getElementById('estratagemas');
-    const sel = document.getElementById('seleccionadas');
-    const limpiarBtn = document.getElementById('limpiarBtn');
+    const img = document.createElement('img');
+    img.src = e.imagen;
+    img.alt = e.nombre;
+    img.title = e.nombre;
+    img.classList.add('w-14', 'h-14');
+    img.dataset.codigo = e.codigo;
+    img.dataset.nombre = e.nombre;
 
-    estratagemas.forEach(e => {
-      const wrapper = document.createElement('div');
-      wrapper.classList.add('flex-shrink-0', 'flex', 'items-center', 'gap-3', 'bg-gray-900', 'rounded', 'px-3', 'py-1');
+    wrapper.appendChild(img);
 
-      const img = document.createElement('img');
-      img.src = e.imagen;
-      img.alt = e.nombre;
-      img.title = e.nombre;
-      img.classList.add('w-14', 'h-14');
-      img.dataset.codigo = e.codigo;
-      img.dataset.nombre = e.nombre;
+    if (e.mision) {
+      wrapper.style.border = "2px solid #facc15 ";
+      contMision.appendChild(wrapper);
 
-      
+      // Mostrar también en seleccionadas como "card"
+      const selWrapper = document.createElement('div');
+      selWrapper.classList.add('flex', 'flex-col', 'items-center', 'gap-2', 'bg-gray-900', 'rounded', 'p-4');
 
-      wrapper.appendChild(img);
+      const clone = img.cloneNode(true);
+      clone.classList.add('w-20', 'h-20');
 
-      if (e.mision) {
-        wrapper.style.border = "2px solid #facc15";
-        contMision.appendChild(wrapper);
+      const codigoSel = document.createElement('div');
+      codigoSel.textContent = e.codigo;
+      codigoSel.classList.add('text-4xl', 'font-bold', 'text-yellow-400', 'tracking-widest', 'font-mono', 'text-center');
 
-        // Mostrar también en seleccionadas
-        const selWrapper = document.createElement('div');
-        selWrapper.classList.add('bg-gray-900', 'rounded', 'px-4', 'py-2', 'flex', 'gap-2', 'items-center');
+      const nombreSel = document.createElement('div');
+      nombreSel.textContent = e.nombre;
+      nombreSel.classList.add('text-sm', 'text-white', 'text-center');
 
-        const inner = document.createElement('div');
-        inner.classList.add('flex', 'items-center', 'gap-4');
+      selWrapper.appendChild(clone);
+      selWrapper.appendChild(codigoSel);
+      selWrapper.appendChild(nombreSel);
+      sel.appendChild(selWrapper);
 
-        const clone = img.cloneNode(true);
-        clone.classList.add('w-20', 'h-20');
+    } else {
+      img.classList.add('cursor-pointer');
 
-        const codigoSel = document.createElement('div');
-        codigoSel.textContent = e.codigo;
-        codigoSel.classList.add('text-4xl', 'font-bold', 'text-yellow-400', 'tracking-widest', 'font-mono');
+      img.addEventListener('click', () => {
+        if (!img.classList.contains('selected')) {
+          img.classList.add('selected');
 
-        const nombreSel = document.createElement('div');
-        nombreSel.textContent = e.nombre;
-        nombreSel.classList.add('text-sm', 'text-white');
+          const selWrapper = document.createElement('div');
+          selWrapper.classList.add('flex', 'flex-col', 'items-center', 'gap-2', 'bg-gray-900', 'rounded', 'p-4');
 
-        inner.appendChild(clone);
-        inner.appendChild(codigoSel);
+          const clone = img.cloneNode(true);
+          clone.classList.add('w-20', 'h-20');
 
-        selWrapper.appendChild(inner);
-        selWrapper.appendChild(nombreSel);
-        sel.appendChild(selWrapper);
-      } else {
-        img.classList.add('cursor-pointer');
+          const codigoSel = document.createElement('div');
+          codigoSel.textContent = e.codigo;
+          codigoSel.classList.add('text-4xl', 'font-bold', 'text-yellow-400', 'tracking-widest', 'font-mono', 'text-center');
 
-        img.addEventListener('click', () => {
-          if (!img.classList.contains('selected')) {
-            img.classList.add('selected');
+          const nombreSel = document.createElement('div');
+          nombreSel.textContent = e.nombre;
+          nombreSel.classList.add('text-sm', 'text-white', 'text-center');
 
-            const selWrapper = document.createElement('div');
-            selWrapper.classList.add('flex', 'flex-col', 'items-center', 'gap-2', 'bg-gray-900', 'rounded', 'px-4', 'py-2');
-
-            const inner = document.createElement('div');
-            inner.classList.add('flex', 'items-center', 'gap-4');
-
-            const clone = img.cloneNode(true);
-            clone.classList.add('w-20', 'h-20');
-
-            const codigoSel = document.createElement('div');
-            codigoSel.textContent = e.codigo;
-            codigoSel.classList.add('text-4xl', 'font-bold', 'text-yellow-400', 'tracking-widest', 'font-mono');
-
-            const nombreSel = document.createElement('div');
-            nombreSel.textContent = e.nombre;
-            nombreSel.classList.add('text-sm', 'text-white');
-
-            inner.appendChild(clone);
-            inner.appendChild(codigoSel);
-
-            selWrapper.appendChild(inner);
-            selWrapper.appendChild(nombreSel);
-            sel.appendChild(selWrapper);
-          } else {
-            img.classList.remove('selected');
-            [...sel.children].forEach(c => {
-              if (c.querySelector('img')?.alt === e.nombre) c.remove();
-            });
-          }
-        });
-
-        cont.appendChild(wrapper);
-      }
-    });
-
-    limpiarBtn.addEventListener('click', () => {
-      document.querySelectorAll('#estratagemas img.selected').forEach(img => img.classList.remove('selected'));
-      [...sel.children].forEach(c => {
-        const nombre = c.querySelector('img')?.alt;
-        const esMision = estratagemas.find(e => e.nombre === nombre)?.mision;
-        if (!esMision) c.remove();
+          selWrapper.appendChild(clone);
+          selWrapper.appendChild(codigoSel);
+          selWrapper.appendChild(nombreSel);
+          sel.appendChild(selWrapper);
+        } else {
+          img.classList.remove('selected');
+          [...sel.children].forEach(c => {
+            if (c.querySelector('img')?.alt === e.nombre) c.remove();
+          });
+        }
       });
+
+      cont.appendChild(wrapper);
+    }
+  });
+
+  limpiarBtn.addEventListener('click', () => {
+    document.querySelectorAll('#estratagemas img.selected').forEach(img => img.classList.remove('selected'));
+    [...sel.children].forEach(c => {
+      const nombre = c.querySelector('img')?.alt;
+      const esMision = estratagemas.find(e => e.nombre === nombre)?.mision;
+      if (!esMision) c.remove();
     });
-  </script>
+  });
+</script>
+
 </body>
 </html>
